@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Theme Flashcards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Cinzel:wght@600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.5s ease;
+        }
+
+        /* Hello Kitty Theme */
+        body.hello-kitty {
+            background: linear-gradient(rgba(255, 179, 217, 0.85), rgba(255, 105, 180, 0.9)), 
+                        url('https://i.pinimg.com/1200x/55/26/d4/5526d43662cd823f541fa6372e39cf16.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            animation: floatBows 20s infinite;
+        }
+
+        body.hello-kitty::before {
+            content: '🎀 🎀 🎀 🎀 🎀';
+            position: fixed;
+            top: 10%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 2rem;
+            opacity: 0.3;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Wolf Theme */
+        body.wolf {
+            background: linear-gradient(rgba(10, 15, 30, 0.85), rgba(20, 30, 50, 0.9)), 
+                        url('https://i.pinimg.com/1200x/05/28/8b/05288be915f12015f654d004e90a512b.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Hatsune Miku Theme */
+        body.miku {
+            background: linear-gradient(rgba(0, 206, 209, 0.7), rgba(30, 144, 255, 0.8)), 
+                        url('https://i.pinimg.com/736x/7c/b2/ed/7cb2ed23c8a1a6f8ade3d8b307d7a85d.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body.miku::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: none;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* MLP Theme */
+        body.mlp {
+            background: linear-gradient(rgba(255, 182, 217, 0.7), rgba(167, 139, 250, 0.8)), 
+                        url('https://i.pinimg.com/1200x/4a/24/4d/4a244d3128d71173025ad7a576b40c65.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body.mlp::before {
+            content: '🌈 ⭐ 🦄 ⭐ 🌈';
+            position: fixed;
+            top: 5%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 2.5rem;
+            opacity: 0.4;
+            pointer-events: none;
+            animation: rainbow 10s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes rainbow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            max-width: 250px;
+        }
+
+        .theme-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .theme-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .theme-btn.hello-kitty-btn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+        }
+
+        .theme-btn.wolf-btn {
+            background: linear-gradient(135deg, #1a2332, #2d4059);
+            color: #00d9ff;
+        }
+
+        .theme-btn.miku-btn {
+            background: linear-gradient(135deg, #00CED1, #1E90FF);
+            color: white;
+        }
+
+        .theme-btn.mlp-btn {
+            background: linear-gradient(135deg, #FFB6D9, #A78BFA);
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+
+        body.wolf .container {
+            background: rgba(20, 30, 50, 0.95);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        body.miku .container {
+            background: rgba(255, 255, 255, 0.97);
+            border: 3px solid #00CED1;
+        }
+
+        body.mlp .container {
+            background: rgba(255, 255, 255, 0.97);
+            border: 3px solid #A78BFA;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2.5rem;
+            transition: all 0.5s ease;
+        }
+
+        body.hello-kitty h1 {
+            color: #ff1493;
+            text-shadow: 3px 3px 6px rgba(255, 20, 147, 0.3);
+        }
+
+        body.wolf h1 {
+            font-family: 'Cinzel', serif;
+            color: #00d9ff;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+        }
+
+        body.miku h1 {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #00CED1, #1E90FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.mlp h1 {
+            background: linear-gradient(90deg, #FFB6D9, #A78BFA, #7DD3FC, #FCD34D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        input, textarea {
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: 'Quicksand', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body.hello-kitty input, body.hello-kitty textarea {
+            border: 3px solid #ffb3d9;
+            background: #fff;
+        }
+
+        body.hello-kitty input:focus, body.hello-kitty textarea:focus {
+            outline: none;
+            border-color: #ff1493;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
+        }
+
+        body.wolf input, body.wolf textarea {
+            background: rgba(30, 40, 60, 0.8);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            color: #fff;
+        }
+
+        body.wolf input::placeholder, body.wolf textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        body.wolf input:focus, body.wolf textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
+        }
+
+        body.miku input, body.miku textarea,
+        body.mlp input, body.mlp textarea {
+            border: 3px solid currentColor;
+            background: #fff;
+        }
+
+        body.miku input, body.miku textarea {
+            border-color: #00CED1;
+        }
+
+        body.mlp input, body.mlp textarea {
+            border-color: #A78BFA;
+        }
+
+        body.miku input:focus, body.miku textarea:focus {
+            outline: none;
+            border-color: #1E90FF;
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.3);
+        }
+
+        body.mlp input:focus, body.mlp textarea:focus {
+            outline: none;
+            border-color: #FFB6D9;
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body.hello-kitty button {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+        }
+
+        body.hello-kitty button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.5);
+        }
+
+        body.wolf button {
+            background: linear-gradient(135deg, #1a4d6d, #00d9ff);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        body.wolf button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.5);
+        }
+
+        body.miku button {
+            background: linear-gradient(135deg, #00CED1, #1E90FF);
+            color: white;
+            box-shadow: 0 4px 15px rgba(30, 144, 255, 0.4);
+        }
+
+        body.miku button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 144, 255, 0.5);
+        }
+
+        body.mlp button {
+            background: linear-gradient(135deg, #FFB6D9, #A78BFA);
+            color: white;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+        }
+
+        body.mlp button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(167, 139, 250, 0.5);
+        }
+
+        .flashcard {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        body.hello-kitty .flashcard {
+            border: 4px solid #ffb3d9;
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.2);
+        }
+
+        body.hello-kitty .flashcard:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 35px rgba(255, 20, 147, 0.3);
+        }
+
+        body.wolf .flashcard {
+            background: rgba(30, 40, 60, 0.9);
+            border: 2px solid rgba(0, 217, 255, 0.4);
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.2);
+        }
+
+        body.wolf .flashcard:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 35px rgba(0, 217, 255, 0.4);
+        }
+
+        body.miku .flashcard {
+            border: 4px solid #00CED1;
+            box-shadow: 0 8px 25px rgba(0, 206, 209, 0.3);
+        }
+
+        body.miku .flashcard:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 35px rgba(0, 206, 209, 0.4);
+        }
+
+        body.mlp .flashcard {
+            border: 4px solid #A78BFA;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.3);
+        }
+
+        body.mlp .flashcard:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 35px rgba(167, 139, 250, 0.4);
+        }
+
+        .flashcard-label {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        body.hello-kitty .flashcard-label {
+            background: #ffb3d9;
+            color: #ff1493;
+        }
+
+        body.wolf .flashcard-label {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00d9ff;
+        }
+
+        body.miku .flashcard-label {
+            background: rgba(0, 206, 209, 0.2);
+            color: #00CED1;
+        }
+
+        body.mlp .flashcard-label {
+            background: rgba(167, 139, 250, 0.2);
+            color: #A78BFA;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .stats {
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        body.hello-kitty .stats {
+            color: #ff1493;
+        }
+
+        body.wolf .stats {
+            color: #00d9ff;
+        }
+
+        body.miku .stats {
+            color: #00CED1;
+        }
+
+        body.mlp .stats {
+            color: #A78BFA;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding: 30px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        body.hello-kitty .footer {
+            background: rgba(255, 255, 255, 0.9);
+            color: #ff1493;
+            border: 3px solid #ffb3d9;
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.2);
+        }
+
+        body.wolf .footer {
+            background: rgba(20, 30, 50, 0.95);
+            color: #00d9ff;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.2);
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+
+        body.miku .footer {
+            background: rgba(255, 255, 255, 0.95);
+            color: #00CED1;
+            border: 3px solid #00CED1;
+            box-shadow: 0 8px 25px rgba(0, 206, 209, 0.3);
+        }
+
+        body.mlp .footer {
+            background: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(90deg, rgba(255, 182, 217, 0.95), rgba(167, 139, 250, 0.95));
+            color: white;
+            border: 3px solid #A78BFA;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-message {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .footer-submessage {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .theme-switcher {
+                top: 10px;
+                right: 10px;
+                max-width: 180px;
+            }
+            
+            .theme-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .footer {
+                margin-top: 20px;
+                padding: 20px;
+            }
+
+            .footer-message {
+                font-size: 1rem;
+            }
+
+            .footer-submessage {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body class="hello-kitty">
+    <div class="theme-switcher">
+        <button class="theme-btn hello-kitty-btn" onclick="changeTheme('hello-kitty')">🎀 Hello Kitty</button>
+        <button class="theme-btn wolf-btn" onclick="changeTheme('wolf')">🐺 Wolf</button>
+        <button class="theme-btn miku-btn" onclick="changeTheme('miku')">🎤 Miku</button>
+        <button class="theme-btn mlp-btn" onclick="changeTheme('mlp')">🦄 MLP</button>
+    </div>
+
+    <div class="container">
+        <h1 id="themeTitle">Hello Kitty Flashcards</h1>
+        
+        <div class="input-section">
+            <input type="text" id="questionInput" placeholder="Enter your question..." />
+            <textarea id="answerInput" placeholder="Enter the answer..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button onclick="addFlashcard()">Add Flashcard</button>
+            <button onclick="shuffleCards()">Shuffle Cards</button>
+            <button onclick="saveCards()">Save Cards</button>
+            <button onclick="document.getElementById('fileInput').click()">Load Cards</button>
+            <input type="file" id="fileInput" accept=".json" onchange="loadCards(event)">
+        </div>
+
+        <div id="flashcardDisplay"></div>
+
+        <div class="navigation">
+            <button onclick="previousCard()">← Previous</button>
+            <div class="stats">
+                <span id="currentCard">0</span> / <span id="totalCards">0</span>
+            </div>
+            <button onclick="nextCard()">Next →</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-message">✨ Made for nino ✨</div>
+        <div class="footer-submessage"> p.s i have to pee so bad while i was made this so if there's bug report for me in ig twin   </div>
+    </div>
+
+
+    <script>
+        let flashcards = [];
+        let currentIndex = 0;
+        let showingQuestion = true;
+        let currentTheme = 'hello-kitty';
+
+        const themeNames = {
+            'hello-kitty': 'Hello Kitty Flashcards',
+            'wolf': 'Wolf Spirit Flashcards',
+            'miku': 'Hatsune Miku Flashcards',
+            'mlp': 'Rarity Flashcards'
+        };
+
+        function changeTheme(theme) {
+            document.body.className = theme;
+            currentTheme = theme;
+            document.getElementById('themeTitle').textContent = themeNames[theme];
+        }
+
+        function addFlashcard() {
+            const question = document.getElementById('questionInput').value.trim();
+            const answer = document.getElementById('answerInput').value.trim();
+
+            if (question && answer) {
+                flashcards.push({ question, answer });
+                document.getElementById('questionInput').value = '';
+                document.getElementById('answerInput').value = '';
+                currentIndex = flashcards.length - 1;
+                showingQuestion = true;
+                displayFlashcard();
+                updateStats();
+            }
+        }
+
+        function displayFlashcard() {
+            const display = document.getElementById('flashcardDisplay');
+            
+            if (flashcards.length === 0) {
+                display.innerHTML = '<div class="empty-state">No flashcards yet! Add your first one above. 📚</div>';
+                return;
+            }
+
+            const card = flashcards[currentIndex];
+            const content = showingQuestion ? card.question : card.answer;
+            const label = showingQuestion ? 'Question' : 'Answer';
+
+            display.innerHTML = `
+                <div class="flashcard" onclick="flipCard()">
+                    <div class="flashcard-label">${label}</div>
+                    <div>${content}</div>
+                </div>
+                <button onclick="deleteCard()" style="margin-top: 10px;">Delete This Card</button>
+            `;
+        }
+
+        function flipCard() {
+            showingQuestion = !showingQuestion;
+            displayFlashcard();
+        }
+
+        function nextCard() {
+            if (flashcards.length === 0) return;
+            currentIndex = (currentIndex + 1) % flashcards.length;
+            showingQuestion = true;
+            displayFlashcard();
+            updateStats();
+        }
+
+        function previousCard() {
+            if (flashcards.length === 0) return;
+            currentIndex = currentIndex === 0 ? flashcards.length - 1 : currentIndex - 1;
+            showingQuestion = true;
+            displayFlashcard();
+            updateStats();
+        }
+
+        function deleteCard() {
+            if (flashcards.length === 0) return;
+            flashcards.splice(currentIndex, 1);
+            if (currentIndex >= flashcards.length) {
+                currentIndex = Math.max(0, flashcards.length - 1);
+            }
+            showingQuestion = true;
+            displayFlashcard();
+            updateStats();
+        }
+
+        function shuffleCards() {
+            for (let i = flashcards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
+            currentIndex = 0;
+            showingQuestion = true;
+            displayFlashcard();
+        }
+
+        function updateStats() {
+            document.getElementById('currentCard').textContent = flashcards.length > 0 ? currentIndex + 1 : 0;
+            document.getElementById('totalCards').textContent = flashcards.length;
+        }
+
+        function saveCards() {
+            if (flashcards.length === 0) {
+                alert('No flashcards to save!');
+                return;
+            }
+
+            const dataStr = JSON.stringify(flashcards, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentTheme}-flashcards.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function loadCards(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const loadedCards = JSON.parse(e.target.result);
+                    if (Array.isArray(loadedCards) && loadedCards.every(card => card.question && card.answer)) {
+                        flashcards = loadedCards;
+                        currentIndex = 0;
+                        showingQuestion = true;
+                        displayFlashcard();
+                        updateStats();
+                        alert(`Successfully loaded ${flashcards.length} flashcards!`);
+                    } else {
+                        alert('Invalid flashcard file format!');
+                    }
+                } catch (error) {
+                    alert('Error reading file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        document.getElementById('answerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                addFlashcard();
+            }
+        });
+
+        updateStats();
+        displayFlashcard();
+    </script>
+</body>
+</html>
